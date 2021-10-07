@@ -2,19 +2,19 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#define TYPE int 
-#define LITTERAL INT_MAX
+#define TYPE int
 
-TYPE global_res = LITTERAL;
-
-TYPE tigress_obf()
+TYPE equal(TYPE a, TYPE b)
 {
-    return LITTERAL;
+    return a == b;
+}
+
+TYPE not_equal(TYPE a, TYPE b)
+{
+    return a != b;
 }
 
 int main() 
 {
-    TYPE res = tigress_obf();
-    global_res = res;
-    return 1;
+    return equal(1, 2) && not_equal(4, 5);
 }
