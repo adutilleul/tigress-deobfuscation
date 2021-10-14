@@ -6,37 +6,37 @@ struct timeval ;
 extern int gettimeofday(struct timeval *tv , void *tz ) ;
 extern int pthread_cond_broadcast(int *cond ) ;
 char **_global_argv  =    (char **)0;
-extern int posix_memalign(void **memptr , unsigned int alignment , unsigned int size ) ;
 extern int getpagesize() ;
+extern int posix_memalign(void **memptr , unsigned int alignment , unsigned int size ) ;
 extern int pthread_join(void *thread , void **value_ptr ) ;
 extern int open(char const   *filename , int oflag  , ...) ;
 extern unsigned int strlen(char const   *s ) ;
 extern int pthread_barrier_destroy(int *barrier ) ;
-extern int strncmp(char const   *s1 , char const   *s2 , unsigned int maxlen ) ;
 extern int pthread_mutex_init(int *mutex , int *attr ) ;
+extern int strncmp(char const   *s1 , char const   *s2 , unsigned int maxlen ) ;
 extern int printf(char const   *format  , ...) ;
 int _global_argc  =    0;
 extern int pthread_cond_signal(int *cond ) ;
+int global_res ;
 extern int pthread_barrier_init(int *barrier , int *attr , unsigned int count ) ;
 extern int raise(int sig ) ;
 extern int scanf(char const   *format  , ...) ;
-long global_res_new ;
 char **_global_envp  =    (char **)0;
 extern int unlink(char const   *filename ) ;
-extern int pthread_barrier_wait(int *barrier ) ;
 void global_res2_i$nit(void) ;
+extern int pthread_barrier_wait(int *barrier ) ;
 extern double difftime(long tv1 , long tv0 ) ;
 extern int pthread_mutex_lock(int *mutex ) ;
 extern void *memcpy(void *s1 , void const   *s2 , unsigned int size ) ;
-extern void *dlsym(void *handle , char *symbol ) ;
 extern int gethostname(char *name , unsigned int namelen ) ;
+extern void *dlsym(void *handle , char *symbol ) ;
 extern void abort() ;
 extern unsigned long strtoul(char const   *str , char const   *endptr , int base ) ;
 extern int fprintf(struct _IO_FILE *stream , char const   *format  , ...) ;
 extern void free(void *ptr ) ;
-extern void exit(int status ) ;
-int main(int _formal_argc , char **_formal_argv , char **_formal_envp ) ;
 extern void signal(int sig , void *func ) ;
+int main(int _formal_argc , char **_formal_argv , char **_formal_envp ) ;
+extern void exit(int status ) ;
 typedef struct _IO_FILE FILE;
 extern int close(int filedes ) ;
 extern int mprotect(void *addr , unsigned int len , int prot ) ;
@@ -46,13 +46,12 @@ extern double ceil(double x ) ;
 typedef unsigned long size_t;
 extern int fcntl(int filedes , int cmd  , ...) ;
 extern int fclose(void *stream ) ;
-extern int pthread_cond_wait(int *cond , int *mutex ) ;
 extern void perror(char const   *str ) ;
+extern int pthread_cond_wait(int *cond , int *mutex ) ;
 int global_res2 ;
-extern int pthread_cond_init(int *cond , int *attr ) ;
 extern int write(int filedes , void *buf , unsigned int nbyte ) ;
+extern int pthread_cond_init(int *cond , int *attr ) ;
 extern int ptrace(int request , void *pid , void *addr , int data ) ;
-void global_res_new_i$nit(void) ;
 int tigress_obf(void) ;
 extern float strtof(char const   *str , char const   *endptr ) ;
 extern unsigned int strnlen(char const   *s , unsigned int maxlen ) ;
@@ -69,13 +68,14 @@ extern int rand() ;
 extern void *fopen(char const   *filename , char const   *mode ) ;
 extern int strcmp(char const   *a , char const   *b ) ;
 extern double sqrt(double x ) ;
-extern int snprintf(char *str , unsigned int size , char const   *format  , ...) ;
-extern void *malloc(unsigned int size ) ;
+void global_res_i$nit(void) ;
 extern long strtol(char const   *str , char const   *endptr , int base ) ;
+extern void *malloc(unsigned int size ) ;
+extern int snprintf(char *str , unsigned int size , char const   *format  , ...) ;
 extern int nanosleep(int *rqtp , int *rmtp ) ;
 extern int pthread_mutex_unlock(int *mutex ) ;
-extern int atoi(char const   *s ) ;
 extern int pthread_create(void *thread , void *attr , void *start_routine , void *arg ) ;
+extern int atoi(char const   *s ) ;
 extern int fseek(struct _IO_FILE *stream , long offs , int whence ) ;
 extern int fscanf(struct _IO_FILE *stream , char const   *format  , ...) ;
 void megaInit(void) ;
@@ -84,24 +84,32 @@ void megaInit(void)
 
 
   {
-  global_res_new_i$nit();
+  global_res_i$nit();
   global_res2_i$nit();
 }
 }
-void global_res_new_i$nit(void) 
+void global_res_i$nit(void) 
 { 
 
 
   {
-  global_res_new = 2147483637L + 45;
+  global_res = 3452947929U;
+}
+}
+void global_res2_i$nit(void) 
+{ 
+
+
+  {
+  global_res2 = 2147483637;
 }
 }
 int main(int _formal_argc , char **_formal_argv , char **_formal_envp ) 
 { 
-  long res ;
+  int res ;
   int tmp ;
   int res2 ;
-  long loop[666] ;
+  int loop[666] ;
   unsigned int tmp___0 ;
   size_t i ;
   int _BARRIER_0 ;
@@ -113,24 +121,24 @@ int main(int _formal_argc , char **_formal_argv , char **_formal_envp )
   _global_envp = _formal_envp;
   _BARRIER_0 = 1;
   tmp = tigress_obf();
-  res = (long )tmp + 45;
-  res2 = (int )((long long )((int )(res - 45)) + 4LL);
-  loop[0] = 2147483637L + 45;
-  loop[1] = 2147483637L + 45;
-  loop[2] = 2147483637L + 45;
-  loop[3] = 2147483637L + 45;
+  res = 1224372505U * tmp + 1888659948U;
+  res2 = (int )((long long )((int )(1563450153U * res - 3257146060U)) + 4LL);
+  loop[0] = 3452947929U;
+  loop[1] = 3452947929U;
+  loop[2] = 3452947929U;
+  loop[3] = 3452947929U;
   tmp___0 = 4U;
   while (! (tmp___0 >= 666U)) {
-    loop[tmp___0] = 0L + 45;
+    loop[tmp___0] = 1888659948U;
     tmp___0 ++;
   }
   i = (size_t )0;
   while (i < (size_t )sizeof(loop)) {
-    res2 -= (int )(loop[i] - 45);
+    res2 -= (int )(1563450153U * loop[i] - 3257146060U);
     i ++;
   }
-  global_res_new = res;
-  return ((int )(res - 45));
+  global_res = res;
+  return ((int )(1563450153U * res - 3257146060U));
 }
 }
 int tigress_obf(void) 
@@ -139,13 +147,5 @@ int tigress_obf(void)
 
   {
   return (2147483637);
-}
-}
-void global_res2_i$nit(void) 
-{ 
-
-
-  {
-  global_res2 = 2147483637;
 }
 }
