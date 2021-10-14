@@ -14,10 +14,10 @@ TYPE not_equal(TYPE a, TYPE b)
     return a != b;
 }
 
-//   return (((unsigned int )((b & ~ a) 
+//   return (((unsigned int )((b & ~ a)
 // | (~ (b ^ a) & (b - a))) >> 31U) & 1);
 
-//   return (((unsigned int )((a - b) ^ 
+//   return (((unsigned int )((a - b) ^
 // ((a ^ b) & ((a - b) ^ a))) >> 31U) & 1);
 
 //   return (((unsigned int )((b | ~ a) &
@@ -48,10 +48,42 @@ TYPE mul(TYPE a, TYPE b)
 
 TYPE bdiv(TYPE a, TYPE b)
 {
+    return a/b;
+}
+
+TYPE inc(TYPE a) {
     return a++;
 }
 
-int main() 
+TYPE mod(TYPE a, TYPE b) {
+    return a%b;
+}
+
+TYPE assignments(TYPE a, TYPE b) {
+    a += b;
+    a -= b;
+    a *= b;
+    a /= b;
+    a %= b;
+    a &= b;
+    a |= b;
+    a ^= b;
+    a <<= b;
+    a >>= b;
+    return a;
+}
+
+TYPE xor(TYPE a, TYPE b) {
+    return a^b;
+}
+
+// TYPE test(TYPE a, TYPE b) {
+//
+// }
+
+
+
+int main()
 {
     return equal(1, 2) && not_equal(4, 5);
 }

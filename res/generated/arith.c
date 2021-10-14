@@ -5,50 +5,54 @@ struct _IO_FILE ;
 struct timeval ;
 extern int gettimeofday(struct timeval *tv , void *tz ) ;
 extern int pthread_cond_broadcast(int *cond ) ;
+int mod(int a , int b ) ;
 char **_global_argv  =    (char **)0;
 extern int getpagesize() ;
 extern int posix_memalign(void **memptr , unsigned int alignment , unsigned int size ) ;
 extern int pthread_join(void *thread , void **value_ptr ) ;
-extern int open(char const   *filename , int oflag  , ...) ;
 extern unsigned int strlen(char const   *s ) ;
+extern int open(char const   *filename , int oflag  , ...) ;
 extern int pthread_barrier_destroy(int *barrier ) ;
 extern int pthread_mutex_init(int *mutex , int *attr ) ;
 extern int strncmp(char const   *s1 , char const   *s2 , unsigned int maxlen ) ;
-extern int printf(char const   *format  , ...) ;
+int assignments(int a , int b ) ;
 int bdiv(int a , int b ) ;
+extern int printf(char const   *format  , ...) ;
 int _global_argc  =    0;
 extern int pthread_cond_signal(int *cond ) ;
+extern int scanf(char const   *format  , ...) ;
 extern int pthread_barrier_init(int *barrier , int *attr , unsigned int count ) ;
 extern int raise(int sig ) ;
-extern int scanf(char const   *format  , ...) ;
 char **_global_envp  =    (char **)0;
 int superior(int a , int b ) ;
 extern int unlink(char const   *filename ) ;
-int add(int a , int b ) ;
+int xor(int a , int b ) ;
 int sub(int a , int b ) ;
+int add(int a , int b ) ;
+int inc(int a ) ;
 extern int pthread_barrier_wait(int *barrier ) ;
 extern double difftime(long tv1 , long tv0 ) ;
-extern int pthread_mutex_lock(int *mutex ) ;
 extern void *memcpy(void *s1 , void const   *s2 , unsigned int size ) ;
-extern int gethostname(char *name , unsigned int namelen ) ;
+extern int pthread_mutex_lock(int *mutex ) ;
 extern void *dlsym(void *handle , char *symbol ) ;
-extern unsigned long strtoul(char const   *str , char const   *endptr , int base ) ;
+extern int gethostname(char *name , unsigned int namelen ) ;
 int equal(int a , int b ) ;
 extern void abort() ;
+extern unsigned long strtoul(char const   *str , char const   *endptr , int base ) ;
 extern int fprintf(struct _IO_FILE *stream , char const   *format  , ...) ;
 extern void free(void *ptr ) ;
-extern void exit(int status ) ;
-int main(int _formal_argc , char **_formal_argv , char **_formal_envp ) ;
 extern void signal(int sig , void *func ) ;
+int main(int _formal_argc , char **_formal_argv , char **_formal_envp ) ;
+extern void exit(int status ) ;
 int inferior(int a , int b ) ;
 typedef struct _IO_FILE FILE;
 extern int mprotect(void *addr , unsigned int len , int prot ) ;
 extern int close(int filedes ) ;
-extern double strtod(char const   *str , char const   *endptr ) ;
 extern double log(double x ) ;
+extern double strtod(char const   *str , char const   *endptr ) ;
 extern double ceil(double x ) ;
-extern int fcntl(int filedes , int cmd  , ...) ;
 extern int fclose(void *stream ) ;
+extern int fcntl(int filedes , int cmd  , ...) ;
 extern int pthread_cond_wait(int *cond , int *mutex ) ;
 extern void perror(char const   *str ) ;
 extern int write(int filedes , void *buf , unsigned int nbyte ) ;
@@ -60,10 +64,10 @@ struct timeval {
    long tv_sec ;
    long tv_usec ;
 };
-extern long clock(void) ;
 extern void qsort(void *base , unsigned int nel , unsigned int width , int (*compar)(void *a ,
                                                                                      void *b ) ) ;
 int not_equal(int a , int b ) ;
+extern long clock(void) ;
 extern long time(long *tloc ) ;
 extern int rand() ;
 extern int read(int filedes , void *buf , unsigned int nbyte ) ;
@@ -78,15 +82,55 @@ extern int pthread_mutex_unlock(int *mutex ) ;
 extern int pthread_create(void *thread , void *attr , void *start_routine , void *arg ) ;
 extern int atoi(char const   *s ) ;
 int mul(int a , int b ) ;
-extern int fseek(struct _IO_FILE *stream , long offs , int whence ) ;
 extern int fscanf(struct _IO_FILE *stream , char const   *format  , ...) ;
+extern int fseek(struct _IO_FILE *stream , long offs , int whence ) ;
 void megaInit(void) ;
-int equal(int a , int b ) 
+int superior(int a , int b ) 
 { 
 
 
   {
-  return (((unsigned int )(((a - b) - (((a - b) + (a - b)) & ((a - b) >> 31))) - 1) >> 31U) & 1);
+  return (((unsigned int )((~ (b ^ a) >> 1) + (b & ~ a)) >> 31U) & 1);
+}
+}
+int xor(int a , int b ) 
+{ 
+
+
+  {
+  return ((a | b) - (a & b));
+}
+}
+int inferior(int a , int b ) 
+{ 
+
+
+  {
+  return (((unsigned int )((a - b) ^ ((a ^ b) & ((a - b) ^ a))) >> 31U) & 1);
+}
+}
+int not_equal(int a , int b ) 
+{ 
+
+
+  {
+  return (((unsigned int )((a - b) | (b - a)) >> 31U) & 1);
+}
+}
+int add(int a , int b ) 
+{ 
+
+
+  {
+  return ((a - ~ b) - 1);
+}
+}
+int sub(int a , int b ) 
+{ 
+
+
+  {
+  return ((a + ~ b) + 1);
 }
 }
 void megaInit(void) 
@@ -97,12 +141,20 @@ void megaInit(void)
 
 }
 }
-int superior(int a , int b ) 
+int mul(int a , int b ) 
 { 
 
 
   {
-  return (((unsigned int )((~ (b ^ a) >> 1) + (b & ~ a)) >> 31U) & 1);
+  return ((a & b) * (a | b) + (a & ~ b) * (~ a & b));
+}
+}
+int mod(int a , int b ) 
+{ 
+
+
+  {
+  return (a % b);
 }
 }
 int main(int _formal_argc , char **_formal_argv , char **_formal_envp ) 
@@ -132,53 +184,47 @@ int main(int _formal_argc , char **_formal_argv , char **_formal_envp )
   return (tmp___1);
 }
 }
-int not_equal(int a , int b ) 
-{ 
-
-
-  {
-  return (((unsigned int )(((a - b) >> 31) - ((a - b) ^ ((a - b) >> 31))) >> 31U) & 1);
-}
-}
-int mul(int a , int b ) 
-{ 
-
-
-  {
-  return ((a & b) * (a | b) + (a & ~ b) * (~ a & b));
-}
-}
-int add(int a , int b ) 
-{ 
-
-
-  {
-  return (((a ^ ~ b) + ((a | b) << 1)) + 1);
-}
-}
-int sub(int a , int b ) 
-{ 
-
-
-  {
-  return ((a ^ b) - ((~ a & b) << 1));
-}
-}
-int bdiv(int a , int b ) 
+int inc(int a ) 
 { 
   int tmp ;
 
   {
   tmp = a;
-  a = (a ^ 1) + ((a & 1) << 1);
+  a = (a | 1) + (a & 1);
   return (tmp);
 }
 }
-int inferior(int a , int b ) 
+int bdiv(int a , int b ) 
 { 
 
 
   {
-  return (((unsigned int )((a - b) ^ ((a ^ b) & ((a - b) ^ a))) >> 31U) & 1);
+  return (a / b);
+}
+}
+int assignments(int a , int b ) 
+{ 
+
+
+  {
+  a = (a | b) + (a & b);
+  a = (a ^ b) - ((~ a & b) << 1);
+  a = (a & b) * (a | b) + (a & ~ b) * (~ a & b);
+  a /= b;
+  a %= b;
+  a = (~ a | b) - ~ a;
+  a = ((a + b) + 1) + ((- a - 1) | (- b - 1));
+  a = ((a - b) - ((a | ~ b) << 1)) - 2;
+  a <<= b;
+  a >>= b;
+  return (a);
+}
+}
+int equal(int a , int b ) 
+{ 
+
+
+  {
+  return (((unsigned int )((((a - b) + ((a - b) >> 31)) ^ ((a - b) >> 31)) - 1) >> 31U) & 1);
 }
 }
