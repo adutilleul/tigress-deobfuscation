@@ -47,11 +47,12 @@ let initialState =
         let count2 = n - ((n >>> 1) &&& 0x5555555555555555L)
         let count4 = (count2 &&& 0x3333333333333333L) + ((count2 >>> 2) &&& 0x3333333333333333L)
         let count8 = (count4 + (count4 >>> 4)) &&& 0x0f0f0f0f0f0f0f0fL
-        (count8 * 0x0101010101010101L) >>> 56 
+        (count8 * 0x0101010101010101L) >>> 56 |> int
     { 
+        ExpressionsCache = Map.empty
         MemoryMap = Map.ofSeq (seq { 
-            yield "inc", Function (fun e -> e + Constant 1L)
-            yield "dec", Function (fun e -> e - Constant 1L)
+            yield "inc", Function (fun e -> e + Constant 1)
+            yield "dec", Function (fun e -> e - Constant 1)
             yield "popcnt", Function (fun e -> match e with Constant c -> Constant(bitcount c) | _ -> failwith "popcnt(int) is excepted")
 
         });

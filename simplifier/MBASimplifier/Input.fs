@@ -16,7 +16,7 @@ type Command =
             | [command] ->
                 match command with
                 | "quit"   | "exit"  -> Exit
-                | "help"   | "help"  -> Help
+                | "help" -> Help
                 | _ -> input
         
             // One argument
