@@ -1,35 +1,33 @@
 ﻿(*
-MIT License
+    MIT License
 
-Copyright (c) 2021 Alban DUTILLEUl, Gauvain THOMAS
+    Copyright (c) 2021 Alban DUTILLEUl, Gauvain THOMAS
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 *)
-
 
 module MBASimplifier.Ast
 
 [<StructuredFormatDisplay("{StructuredFormatDisplay}")>]
 type Name = { Key : string }
     with 
-        member private t.StructuredFormatDisplay = t.Key
-
+        member private t.StructuredFormatDisplay = t.Key   
 and Expr =
     | Constant              of int64
     | Variable              of Name
@@ -66,37 +64,63 @@ and Expr =
     | LogicNegation         of Expr
 
       member this.humanize() = 
+          let format_binary_op (e1: Expr) (e2: Expr) op = (e1.stringize(e1.Priority < this.Priority)) + " " + op + " " + (e2.stringize(e1.Priority < this.Priority))
+          let format_unary_op (e: Expr) op =  op + (e.stringize(e.Priority < this.Priority))
           match this with 
-            | Constant a -> sprintf "%d" a
+            | Constant c -> sprintf "%d" c
             | Variable e -> e.Key
-            | FunctionCall(n, e) -> sprintf "%s %s" n.Key (e.humanize())
+            | FunctionCall(n, e) -> sprintf "%s %s" n.Key (e.stringize(e.Priority < this.Priority))
 
-            | LogicOr(e1, e2) -> sprintf "(%s || %s)" (e1.humanize()) (e2.humanize())
-            | LogicAnd(e1, e2) -> sprintf "(%s && %s)" (e1.humanize()) (e2.humanize())
-            | LogicNegation(e) -> sprintf "!(%s)" (e.humanize())
+            | LogicOr(e1, e2) -> format_binary_op e1 e2 "||"
+            | LogicAnd(e1, e2) -> format_binary_op e1 e2 "&&"
+            | LogicNegation(e) -> format_unary_op e "!"
 
-            | Subtract(e1, e2) -> sprintf "(%s - %s)" (e1.humanize()) (e2.humanize())
-            | Add(e1, e2) -> sprintf "(%s + %s)" (e1.humanize()) (e2.humanize())
-            | Multiply(e1, e2) -> sprintf "(%s * %s)" (e1.humanize()) (e2.humanize())
-            | Divide(e1, e2) -> sprintf "(%s / %s)" (e1.humanize()) (e2.humanize())
-            | Modulo(e1, e2) -> sprintf "(%s %% %s)" (e1.humanize()) (e2.humanize())
-            | Negative(e) -> sprintf "-(%s)" (e.humanize())
+            | Subtract(e1, e2) -> format_binary_op e1 e2 "-"
+            | Add(e1, e2) -> format_binary_op e1 e2 "+"
+            | Multiply(e1, e2) -> format_binary_op e1 e2 "*"
+            | Divide(e1, e2) -> format_binary_op e1 e2 "/"
+            | Modulo(e1, e2) -> format_binary_op e1 e2 "%"
+            | Negative(e) -> format_unary_op e "-"
 
-            | BitwiseNegation(e) -> sprintf "~(%s)" (e.humanize())
-            | BitwiseAnd(e1, e2) -> sprintf "(%s & %s)" (e1.humanize()) (e2.humanize())
-            | BitwiseOr(e1, e2) -> sprintf "(%s | %s)" (e1.humanize()) (e2.humanize())
-            | BitwiseXor(e1, e2) -> sprintf "(%s ^ %s)" (e1.humanize()) (e2.humanize())
-            | BitwiseLeftShift(e1, e2) -> sprintf "(%s << %s)" (e1.humanize()) (e2.humanize())
-            | BitwiseRightShift(e1, e2) -> sprintf "(%s >> %s)" (e1.humanize()) (e2.humanize())
-            | Equal(e1, e2) -> sprintf "(%s == %s)" (e1.humanize()) (e2.humanize())
-            | NotEqual(e1, e2) -> sprintf "(%s != %s)" (e1.humanize()) (e2.humanize())
+            | BitwiseAnd(e1, e2) -> format_binary_op e1 e2 "&"
+            | BitwiseOr(e1, e2) -> format_binary_op e1 e2 "|"
+            | BitwiseXor(e1, e2) -> format_binary_op e1 e2 "^"
+            | BitwiseLeftShift(e1, e2) -> format_binary_op e1 e2 "<<"
+            | BitwiseRightShift(e1, e2) -> format_binary_op e1 e2 ">>"
+            | Equal(e1, e2) -> format_binary_op e1 e2 "=="
+            | NotEqual(e1, e2) -> format_binary_op e1 e2 "!="
+            | BitwiseNegation(e) -> format_unary_op e "~"
 
-            | GreaterOrEqual(e1, e2) -> sprintf "(%s >= %s)" (e1.humanize()) (e2.humanize())
-            | GreaterThan(e1, e2) -> sprintf "(%s > %s)" (e1.humanize()) (e2.humanize())
-            | LessOrEqual(e1, e2) -> sprintf "(%s <= %s)" (e1.humanize()) (e2.humanize())
-            | LessThan(e1, e2) -> sprintf "(%s < %s)" (e1.humanize()) (e2.humanize())
+            | GreaterOrEqual(e1, e2) -> format_binary_op e1 e2 ">="
+            | GreaterThan(e1, e2) -> format_binary_op e1 e2 ">"
+            | LessOrEqual(e1, e2) -> format_binary_op e1 e2 "<="
+            | LessThan(e1, e2) -> format_binary_op e1 e2 "<"
+
+      member this.stringize(parenthesesRequired) = 
+        let exprStr = (this.humanize()) in 
+        match this with 
+            | Constant _ | Variable _ -> exprStr 
+            | _ -> if parenthesesRequired then sprintf "(%s)" exprStr else exprStr   
+
+      member this.Priority with get() : int  = 
+        match this with 
+            | Constant _ | Variable _ -> 1
+            | LogicOr(e1, e2) -> 2
+            | LogicAnd(e1, e2) -> 3
+            | BitwiseOr(e1, e2) -> 4 
+            | BitwiseXor(e1, e2) -> 5
+            | BitwiseAnd(e1, e2) -> 6 
+            | NotEqual(e1, e2) -> 7 
+            | Equal(e1, e2) -> 7
+            | LessOrEqual(_, _) | LessThan(_, _) | GreaterOrEqual(_, _) | GreaterThan(_, _) -> 8
+            | BitwiseLeftShift(_, _)| BitwiseRightShift(_, _) -> 9
+            | Add(_, _)  | Subtract(_, _) -> 10
+            | Modulo(_, _)| Divide(_, _) | Multiply(_, _) -> 11
+            | BitwiseNegation(_) | LogicNegation(_) | Negative(_) -> 12
+            | FunctionCall(n, e) -> 13
 
       (* Helpers *)
+      static member (~-) (e1) = Negative(e1)
       static member (+) (e1,e2) = Add(e1,e2)
       static member (*) (e1,e2) = Multiply(e1,e2)
       static member (/) (e1,e2) = Divide(e1,e2)
@@ -113,15 +137,15 @@ and Expr =
           let rec count expr = match expr with 
                                   | Constant _ -> 1
                                   | Variable _ -> 2
-                                  | FunctionCall(n,e) -> 20 + count e
                                   | Negative e | BitwiseNegation e | LogicNegation e -> 4 + count e
                                   | Add(e1, e2) | Multiply(e1, e2) | Subtract (e1, e2) | Divide(e1, e2) | Modulo(e1, e2)
                                   | BitwiseLeftShift(e1, e2) | BitwiseRightShift(e1, e2) | BitwiseAnd(e1, e2) | BitwiseXor(e1, e2) 
                                   | BitwiseOr(e1, e2) | Equal(e1, e2) | NotEqual(e1, e2) | GreaterOrEqual(e1, e2) | LessOrEqual(e1, e2) 
                                   | GreaterThan(e1, e2) | LessThan(e1, e2) | LogicAnd(e1, e2) | LogicAnd(e1, e2) | LogicOr(e1, e2) -> 8 + count e1 + count e2
+                                  | FunctionCall(_,e) -> 20 + count e
           count this
 and Statement =
-| Single of Expr
-| Assignment of VariableAssignment list
+    | Single of Expr
+    | Assignment of VariableAssignment list
 
 and VariableAssignment = Name * Expr

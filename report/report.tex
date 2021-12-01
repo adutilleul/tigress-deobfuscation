@@ -1,0 +1,528 @@
+\documentclass{projectreport}
+\usepackage{lipsum}
+\usepackage[newfloat]{minted}
+\usemintedstyle{vs}
+\usepackage[toc,page]{appendix}
+\usepackage{tikz,varwidth}
+\usepackage{booktabs}
+\usepackage{ltablex}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{enumitem}% http://ctan.org/pkg/enumitem
+\usetikzlibrary{matrix,decorations.markings}
+\title{Code Deobfuscation}
+
+\author{
+  Alban Dutilleul\\
+  \texttt{\href{mailto:alban.dutilleul@ens-rennes.fr}{alban.dutilleul@ens-rennes.fr}}
+  \and
+  Gauvain Thomas\\
+  \texttt{\href{mailto:gauvain.thomas@ens-rennes.fr}{gauvain.thomas@ens-rennes.fr}}
+}
+
+%%%%%%%%%%%%%%
+% References %
+%%%%%%%%%%%%%%
+
+% If changing the name of the bib file, change \bibliography{test} at the bottom
+\begin{filecontents}{refs.bib}
+
+@book{HackersDelight,
+author = {Warren, Henry S.},
+title = {Hacker's Delight},
+year = {2012},
+isbn = {0321842685},
+publisher = {Addison-Wesley Professional},
+edition = {2nd},
+abstract = {In Hackers Delight, Second Edition, Hank Warren once again compiles an irresistible collection of programming hacks: timesaving techniques, algorithms, and tricks that help programmers build more elegant and efficient software, while also gaining deeper insights into their craft. Warrens hacks are eminently practical, but theyre also intrinsically interesting, and sometimes unexpected, much like the solution to a great puzzle. They are, in a word, a delight to any programmer who is excited by the opportunity to improve. Extensive additions in this edition include A new chapter on cyclic redundancy checking (CRC), including routines for the commonly used CRC-32 code A new chapter on error correcting codes (ECC), including routines for the Hamming code More coverage of integer division by constants, including methods using only shifts and adds Computing remainders without computing a quotient More coverage of population count and counting leading zeros Array population count New algorithms for compress and expand An LRU algorithm Floating-point to/from integer conversions Approximate floating-point reciprocal square root routine A gallery of graphs of discrete functions Now with exercises and answers}
+}
+
+@inproceedings{Guinet2016AryboMC,
+  title={Arybo: Manipulation, Canonicalization and Identification of Mixed Boolean-Arithmetic Symbolic Expressions},
+  author={Adrien Guinet and Ninon Eyrolles and Marion Videau},
+  year={2016}
+}
+
+@inproceedings {syntia,
+author = {Tim Blazytko and Moritz Contag and Cornelius Aschermann and Thorsten Holz},
+title = {Syntia: Synthesizing the Semantics of Obfuscated Code},
+booktitle = {26th {USENIX} Security Symposium ({USENIX} Security 17)},
+year = {2017},
+isbn = {978-1-931971-40-9},
+address = {Vancouver, BC},
+pages = {643--659},
+url = {https://www.usenix.org/conference/usenixsecurity17/technical-sessions/presentation/blazytko},
+publisher = {{USENIX} Association},
+month = aug,
+}
+
+@inproceedings{eyrolles,
+  TITLE = {{Defeating MBA-based Obfuscation}},
+  AUTHOR = {Eyrolles, Ninon and Goubin, Louis and Videau, Marion},
+  URL = {https://hal.archives-ouvertes.fr/hal-01388109},
+  BOOKTITLE = {{2nd International Workshop on Software PROtection}},
+  ADDRESS = {Vienna, Austria},
+  EDITOR = {ACM},
+  YEAR = {2016},
+  MONTH = Oct,
+  DOI = {10.1145/2995306.2995308},
+  KEYWORDS = {pattern matching ; expression simplification ; mixed boolean-arithmetic expressions ; reverse engineering ; Obfuscation},
+  PDF = {https://hal.archives-ouvertes.fr/hal-01388109/file/spro05.pdf},
+  HAL_ID = {hal-01388109},
+  HAL_VERSION = {v1},
+}
+
+@inproceedings{decidability,
+author = {Richardson, Dan and Fitch, John},
+title = {The Identity Problem for Elementary Functions and Constants},
+year = {1994},
+isbn = {0897916387},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/190347.190429},
+doi = {10.1145/190347.190429},
+abstract = {A solution for a version of the identify problem is proposed for a class of functions including the elementary functions. Given f(x), g(x), defined at some point β we decide whether or not f(x) = g(x) in some neighbourhood of β. This problem is first reduced to a problem about zero equivalence of elementary constants. Then a semi algorithm is given to solve the elementary constant problem. This semi algorithm is guaranteed to give the correct answer whenever it terminates, and it terminates unless the problem being considered contains a counterexample to Schanuel's conjecture.},
+booktitle = {Proceedings of the International Symposium on Symbolic and Algebraic Computation},
+pages = {285–290},
+numpages = {6},
+location = {Oxford, United Kingdom},
+series = {ISSAC '94}
+}
+
+@book{termrewriting,
+author = {Baader, Franz and Nipkow, Tobias},
+title = {Term Rewriting and All That},
+year = {1998},
+isbn = {0521455200},
+publisher = {Cambridge University Press},
+address = {USA}
+}
+
+@inproceedings{z3solver,
+author = {De Moura, Leonardo and Bj\o{}rner, Nikolaj},
+title = {Z3: An Efficient SMT Solver},
+year = {2008},
+isbn = {3540787992},
+publisher = {Springer-Verlag},
+address = {Berlin, Heidelberg},
+abstract = {Satisfiability Modulo Theories (SMT) problem is a decision problem for logical first order formulas with respect to combinations of background theories such as: arithmetic, bit-vectors, arrays, and uninterpreted functions. Z3 is a new and efficient SMT Solver freely available from Microsoft Research. It is used in various software verification and analysis applications.},
+booktitle = {Proceedings of the Theory and Practice of Software, 14th International Conference on Tools and Algorithms for the Construction and Analysis of Systems},
+pages = {337–340},
+numpages = {4},
+location = {Budapest, Hungary},
+series = {TACAS'08/ETAPS'08}
+}
+
+@MISC{collberg,
+    author = {Christian Collberg and Clark Thomborson and Douglas Low},
+    title = {A Taxonomy of Obfuscating Transformations},
+    year = {1997}
+}
+
+@book{knuth,
+author = {Knuth, Donald E.},
+title = {The Art of Computer Programming, Volume 2 (3rd Ed.): Seminumerical Algorithms},
+year = {1997},
+isbn = {0201896842},
+publisher = {Addison-Wesley Longman Publishing Co., Inc.},
+address = {USA}
+}
+
+@inproceedings{abstract,
+author = {Cousot, Patrick and Cousot, Radhia},
+title = {Abstract Interpretation: A Unified Lattice Model for Static Analysis of Programs by Construction or Approximation of Fixpoints},
+year = {1977},
+isbn = {9781450373500},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/512950.512973},
+doi = {10.1145/512950.512973},
+abstract = {A program denotes computations in some universe of objects. Abstract interpretation of programs consists in using that denotation to describe computations in another universe of abstract objects, so that the results of abstract execution give some information on the actual computations. An intuitive example (which we borrow from Sintzoff [72]) is the rule of signs. The text -1515 * 17 may be understood to denote computations on the abstract universe {(+), (-), (±)} where the semantics of arithmetic operators is defined by the rule of signs. The abstract execution -1515 * 17 → -(+) * (+) → (-) * (+) → (-), proves that -1515 * 17 is a negative number. Abstract interpretation is concerned by a particular underlying structure of the usual universe of computations (the sign, in our example). It gives a summary of some facets of the actual executions of a program. In general this summary is simple to obtain but inaccurate (e.g. -1515 + 17 → -(+) + (+) → (-) + (+) → (±)). Despite its fundamentally incomplete results abstract interpretation allows the programmer or the compiler to answer questions which do not need full knowledge of program executions or which tolerate an imprecise answer, (e.g. partial correctness proofs of programs ignoring the termination problems, type checking, program optimizations which are not carried in the absence of certainty about their feasibility, …).},
+booktitle = {Proceedings of the 4th ACM SIGACT-SIGPLAN Symposium on Principles of Programming Languages},
+pages = {238–252},
+numpages = {15},
+location = {Los Angeles, California},
+series = {POPL '77}
+}
+
+@InProceedings{abstract_detection,
+author="Dalla Preda, Mila
+and Madou, Matias
+and De Bosschere, Koen
+and Giacobazzi, Roberto",
+editor="Johnson, Michael
+and Vene, Varmo",
+title="Opaque Predicates Detection by Abstract Interpretation",
+booktitle="Algebraic Methodology and Software Technology",
+year="2006",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="81--95",
+abstract="Code obfuscation and software watermarking are well known techniques designed to prevent the illegal reuse of software. Code obfuscation prevents malicious reverse engineering, while software watermarking protects code from piracy. An interesting class of algorithms for code obfuscation and software watermarking relies on the insertion of opaque predicates. It turns out that attackers based on a dynamic or an hybrid static-dynamic approach are either not precise or time consuming in eliminating opaque predicates. We present an abstract interpretation-based methodology for removing opaque predicates from programs. Abstract interpretation provides the right framework for proving the correctness of our approach, together with a general methodology for designing efficient attackers for a relevant class of opaque predicates. Experimental evaluations show that abstract interpretation based attacks significantly reduce the time needed to eliminate opaque predicates.",
+isbn="978-3-540-35636-3"
+}
+
+@InProceedings{concolic,
+author={Bardin, Sébastien and David, Robin and Marion, Jean-Yves},
+booktitle={2017 IEEE Symposium on Security and Privacy (SP)},
+title={Backward-Bounded DSE: Targeting Infeasibility Questions on Obfuscated Codes}, 
+year={2017},
+volume={},
+number={},
+pages={633-651},
+doi={10.1109/SP.2017.36}}
+
+
+
+
+\end{filecontents}
+
+\begin{document}
+
+\setstretch{1,0}
+
+\maketitle
+
+%%%%%%%%%%%
+% Article %
+%%%%%%%%%%%
+
+\section{Introduction}
+
+In this project we will propose look at three transformations of the Tigress source-to-source obfuscator for the C language and propose ways to solve them. We will also consider our implementation of a tool to simplify \textsf{MBA} (Mixed Boolean-Arithmetic ) expressions which we will define in detail later.
+
+\section{Analysis and attacks of several Tigress transformations}
+
+\subsection{Encode Data}
+\subsubsection{General comments}
+The \textit{EncodeData} transformation replaces integer variables with non-standard representations. 
+
+Through the \verb|--EncodeDataCodecs| option, it is possible to choose between several representations, although we are only interested in the first one (\textbf{\textsf{poly1}}).
+Indeed the other transformations are not very interesting, they use trivial identities and are therefore very easy to detect.
+
+\begin{description}[font=\sffamily\bfseries, leftmargin=1cm, style=nextline]
+  \item[poly1]
+    Linear transformation using invertible affine functions $f(x) = ax +b$ (with $a \neq  0$) and $f^{-1}(x) = a^{-1} \times x - b \times a^{-1}$.
+  \item[xor]
+    Exclusive-or with a constant using the identity $A \oplus C \oplus C = A$.
+  \item[add]
+    Add a constant and promote to next largest integer type. It is not supported for the largest integer type. 
+\end{description}
+
+If a variable is global an initialization function will be generated and called at the very beginning of the \verb|main|. In the case of the initialization of an array, the first initialized constants are unrolled and the rest will be initialized in a loop to a default value. 
+
+\begin{minted}[breaklines]{c}
+  loop[0] = 1956833575U;
+  loop[1] = 1956833575U;
+  loop[2] = 1956833575U;
+  loop[3] = 1956833575U;
+  tmp___0 = 4U;
+  while (! (tmp___0 >= 5U)) {
+    loop[tmp___0] = 1206696158U;
+    tmp___0 ++;
+  }
+\end{minted}
+
+All local variables that are encoded in the same scope must have the same type otherwise Tigress raises an error.
+
+\subsubsection{In-depth analysis of the poly1 encoding}
+
+\textbf{\textsf{poly1}} computes the modular inverse $f^{-1}$ of an affine function $f$ such that $f^{-1}(f(x)) = x$. Given an integer $a$ and a modulus $m$, its modular multiplicative inverse
+is an integer $u$ such that $au$ is congruent to $1$ modulo $m$. A standard way to compute $u$ is to use Euclid's extended algorithm. These operations take place on unsigned integers and are reconverted as needed.
+
+\begin{itemize}
+    \item One way to find the original constant of \textbf{\textsf{poly1}} in our code is to find the first place where our variable $v$ is initialized. If the expression has an affine pattern, we can calculate the modular inverse such as $a' \gets a^{-1} \mod 2^n$ and save $b' \gets b$. It is possible that an initialization does not contain an affine expression but a constant, in this case we will look further in the code for an affine use as in (2) and we will use it directly in it.
+    \item As soon as we find a use of $v$ within another affine expression, we check that the calculated modular inverse is the right one by comparing it to $a'$, we also check that $(b' * a') \mod 2^n = b$.
+    \item If both conditions are verified, we can then directly replace with the expected value because it was indeed an obfuscated expression. If the expression is nested, we just do a depth-first search by repeating the same process.
+\end{itemize}
+
+\subsubsection{Closing remarks}
+
+Combining this transformation with \textit{EncodeArithmetic} (which we will present next) makes the problem much more complicated as the expression of the affine function is also modified.
+
+\subsection{Encode Arithmetic}
+
+\subsubsection{Mixed Boolean-Arithmetic expression}
+
+This transformation allows to transform a standard arithmetic expression into a Mixed Boolean-Arithmetic (\textsf{MBA}) expression.
+
+\begin{definition}[\textsf{MBA} expression] An expression $E$ of the form
+\begin{equation}
+    E = \sum_{i \in I} a_i (\prod_{j \in J_i} e_{i, j}(x_1, \ldots, x_t ))
+\end{equation}
+where the arithmetic sum and product are modulo $2^n$, $a_i$ are constants in $\Z/2^n\Z$, $e_{i,j}$ are bitwise
+expressions (using the following operators : $\wedge, \neg, \lor, \oplus, \ll, \gg$) of variables $x_1, \ldots, x_t $ in $\{0, 1\}^n$, $I \subset \Z $ and for all $i \in I$, $J_i \subset Z$ are finite index sets is a Mixed Boolean-Arithmetic (\textsf{MBA}) expression.
+
+\end{definition}
+
+\begin{example}
+For instance a simple addition is transformed into the following \textsf{MBA} expression by Tigress
+\begin{equation}
+    (x \oplus y) + 2 * (x \land y) 
+\end{equation}
+\end{example}
+
+To generate these expressions, Tigress uses a set of identities that are randomly chosen. They are then applied recursively to a certain depth. It is possible to explore these rules exhaustively by generating a large number of expressions based on the basic operators (see the  \hyperref[app:rules]{appendix}). \\
+Most of these identities are extracted from \cite{HackersDelight}. All integer comparison operations are represented by \textsf{MBA} expressions with results in their most significant bit (\textsf{MSB}).
+
+\subsubsection{Symbolic simplification of MBAs}
+
+We will detail here our approach to simplify the expressions generated by Tigress. The state of the art proposes several types of solutions to simplify generic \textsf{MBA} expressions: pattern matching \cite{eyrolles}, bit-blasting \cite{Guinet2016AryboMC}, and program synthesis \cite{syntia}. \\
+The scope of our work being limited to Tigress which has only a limited number of known rewriting rules led us to choose the pattern matching option.  This technique is based on the term rewriting theory that we will briefly describe here.
+
+\begin{definition}[Term Rewriting System]
+A Term Rewrite System (\textsf{TRS}) \cite{termrewriting} is composed of a set $\Sigma$ of function symbols and a set $\mathcal{R}$ of rewrite rules over $\mathcal{T}$ (set of terms). A reduction $x \mapsto y$ corresponds to the application of a rule on the term $x$. A term is said to be normalizing if no other rules can be applied to it.
+
+\end{definition}
+\begin{definition}[TRS Properties]
+A \textsf{TRS} can have several properties, termination, confluence and convergence.
+\begin{enumerate}
+    \item \textbf{Terminating: } There is no infinite descending chain $a_0 \mapsto a_1 \mapsto \cdots$
+    \item \textbf{Confluent: } When there are different rules to apply from a term $t$, leading to two different terms $y_1$ and $y_2$, we always find a common term $z$ that can be reached from both $y_1$ and $y_2$ by successive applications of rewrite rules.
+    \item \textbf{Convergent: } It is both confluent and terminating.
+\end{enumerate}
+\end{definition}
+
+It is therefore relatively straightforward to construct our rewriting system from the Tigress identities, however it is difficult to bring together more than one of the properties stated above. One of the first problems arises from the associativity and commutativity of some arithmetic and bitwise operators ($\{+, \times, \land, \lor, \oplus$\}). We can't include these rules in our system unless we create cycles. The solutions proposed in the literature are not easy to implement \cite{termrewriting}, based for instance on solving homogeneous linear diophantine equations in the non-negatives integers.  \\
+If we want to have the convergence property, it implies to determine normal forms, but the complexity of the operations in this TRS makes this difficult to consider. According to Richardson's theorem \cite{decidability}, checking the equivalence of two arithmetic expressions  for a certain fairly natural class of expressions is actually an undecidable problem. \\
+It is nevertheless possible thanks to \textsf{SMT} solvers like Z3 \cite{z3solver} to determine in some cases if two expressions are equivalent (for instance: $\neg (a \oplus 23) \equiv (a \oplus 232)$) but it is very costly in performance. This is why we have chosen not to use one. \\
+The rewriting system we propose uses only one structural equality, which increases the number of rules because a new one must be created as soon as an operation is commutative. 
+
+\subsubsection{The simplification tool: MBA Simplifier}
+We have implemented our rewriting system in a tool named \href{https://github.com/adutilleul/tigress-deobfuscation}{\textbf{MBASimplifier}}.  It has been realized in the F\# functional language, which proposes a powerful pattern matching and a type system facilitating the modeling of a symbolic expression (through sum types).
+
+\paragraph{Project Structure} 
+
+\begin{itemize}
+    \item \textbf{Simplifier.fs} Simplify.fs contains the term rewriting system 
+    \item \textbf{Ast.fs} The representation of a symbolic MBA expression 
+    \item \textbf{Engine.fs} The parser of an expression corresponding to a subset of the C99 standard
+    \item \textbf{Input.fs}, \textbf{UserInterface.fs} Interactions with the user on the standard input 
+    \item \textbf{Main.fs} Program entry point
+\end{itemize}
+
+The simplification algorithm corresponds to the following pseudocode, a cycle detection algorithm was used to verify that the rule system does not prevent termination.
+
+\begin{algorithm}
+\caption{Eval function pseudocode}\label{alg:cap}
+\begin{algorithmic}
+    \State $expr', \mu, \lambda \gets$ \Call{floydCycle}{$expr$, $simp$}
+    \LineComment $\lambda$ is the length of the cycle
+    \If{$\lambda > 1$}
+    \Call{Exception}{}
+    \Else 
+    \LineComment Termination condition.
+    \If{$expr' \equiv expr $}
+    \Return $expr$
+    \Else 
+    \Return \Call{eval}{$expr'$}
+    \EndIf
+    \EndIf
+\end{algorithmic}
+\end{algorithm}
+
+Classical arithmetic and binary simplification identities have been used in parallel with Tigress specific rules (e.g. $A \lor A \equiv A$). \\
+Since the reduction paths can be long, a hash table of simplifications is used for performance reasons.
+\paragraph{Results}
+In order to propose consistent and reproducible results we propose unit tests.  Moreover, a script is available to generate an arbitrary number of expressions obfuscated by Tigress, for the moment they have to be compared manually because of the equivalence problem of the expressions mentioned above.
+However, we propose a measure of the complexity of expressions to quantify the simplification. Expressions are represented as a tree, so we can weight the nodes according to the type of operation.
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{ll}
+\hline
+\multicolumn{1}{|l|}{Type}            & \multicolumn{1}{l|}{Weight} \\ \hline
+\multicolumn{1}{|l|}{Constant}        & \multicolumn{1}{l|}{1}      \\ \hline
+\multicolumn{1}{|l|}{Variable}        & \multicolumn{1}{l|}{2}      \\ \hline
+\multicolumn{1}{|l|}{Unary operator}  & \multicolumn{1}{l|}{4}      \\ \hline
+\multicolumn{1}{|l|}{Binary operator} & \multicolumn{1}{l|}{8}      \\ \hline
+\end{tabular}
+\end{table}
+
+It also is possible to use the dataset named dataset1.c to compare the results on randomly generated expressions, they come from this \href{https://github.com/werew/qsynth-artifacts/blob/master/datasets/custom_EA_ED/original.c}{paper}.
+
+\paragraph{Limits of our tool}
+
+\begin{enumerate}
+    \item The lack of genericity, if new identities were added, it would be less able to simplify.
+    \item The implementation of associativity and commutativity which are not optimal.
+\end{enumerate}
+
+\subsection{Add opaque}
+
+This transformation inject superfluous branches (also known as dead branches) in order to complexify the control flow graph (\textsf{CFG}).
+
+\subsubsection{Opaque predicates}
+
+\textit{Collberg et al.} introduced the notation of opaque predicates in 1997 \cite{collberg}.
+
+\begin{definition}[Opaque predicate] An opaque predicate is an invariant expression that
+always evaluates to true or false with the intention of hiding the fact they are constant.
+\end{definition}
+\textit{Collberg} differentiates these predicates into several categories according to the difficulty to detect them automatically.
+
+\begin{description}[font=\sffamily\bfseries, leftmargin=1cm, style=nextline]
+  \item[Trivial]
+    A \textit{trivial} opaque predicate is constructed inside a basic block so its invariant expression can be identified at a basic block level.
+  \item[Weak]
+    A \textit{weak} opaque predicate is constructed throughout a function so it requires intra-procedural analysis to identify its invariant
+expression.
+  \item[Strong]
+    A \textit{strong} opaque predicate is constructed across multiple functions so it requires inter-procedural analysis to identify its invariant expression.
+  \item[Full]
+  A \textit{full} opaque predicate is constructed across multiple processes so it requires inter-process analysis to identify its invariant expression.
+\end{description}
+
+We will use this classification on the different types of invariants proposed by Tigress.
+
+\subsubsection{Invariants generated by Tigress}
+
+Tigress allows through the \verb|--AddOpaqueKinds| option to choose among the following invariants: 
+
+\begin{description}[font=\sffamily\bfseries, leftmargin=1cm, style=nextline]
+  \item[True]
+    Places a branch that evaluates all the time because the predicate is true.
+  \item[Junk]
+    Places into a dead branch a sequence of random bytes into the assembly code.
+  \item[Bug]
+    Places a buggified version of its sibling authentic basic block in the unreachable basic block.
+  \item[Question]
+  Places copy of sibling authentic basic block in the unreachable basic block. 
+  \item[Fake]
+  Places a function call to a non-existing function in the unreachable basic block.
+  \item[Call]
+  Places a function call to a random function existing in executable binary in the unreachable basic.
+\end{description}
+
+In addition to that, invariants can use complex predicates via the --AddOpaqueStructs option. Either by using chained lists, or arrays, entropy generated from an external thread but also from the program input. \\
+
+If we only consider the options on classical data structures, the complexity varies from trivial to weak since the invariants only depend on the function.
+\begin{example}
+Input-based invariants are not much more complicated to detect as long as we know the inputs.
+With the following inputs \verb|--Inputs='+2:int:1?2147483647'|, here is the original and generated obfuscated code.
+\begin{minted}[linenos,tabsize=2,breaklines]{c}
+str [i] = (( str [ i ] - 'a' + num_shift ) % 26) + 'a';
+\end{minted}
+\begin{minted}[linenos,tabsize=2,breaklines]{c}
+atoi_result7 = atoi (*( _ obf_2_ main_ _argv + 2) ) ;
+if (( atoi_result7 - 1 < 0) + ( atoi_result7 - 2147483647 >0) ) {
+    *( str + i ) = ( char ) 2;
+} else {
+    *( str + i ) = ( char ) (((( int ) *( str + i ) - 97) + num_shift ) % 26 + 97) ;
+}
+\end{minted}
+\end{example}
+
+However, thread-based entropy invariants are much more difficult to detect. Tigress uses a Linear congruential generator (\textsf{LCG}) of \textit{Donald Knuth}, the values of the
+modulus, multiplier and increment are as defined as: $a = 6364136223846793005, c = 1442695040888963407$ \cite{knuth}.
+
+\begin{minted}[linenos,tabsize=2,breaklines]{c}
+  case 3: 
+    __asm__  volatile   ("cpuid\n"
+                         "rdtsc\n": "=a" (low6), "=d" (high7));
+    newValue4 = ((unsigned long )high7 << 32) | (unsigned long )low6;
+    break;
+    }
+    _1_entropy = (newValue4 + 3) | _1_entropy;
+    _1_entropy = 6364136223846793005UL * _1_entropy + 1442695040888963407UL;
+\end{minted}
+
+The \verb|_1_entropy| value used in the \textsf{LCG} is the number of cycles that were required to execute the \textbf{x86} instruction \verb|cpuid| on the processor.
+
+Using the environment (as with this entropy function) moves an invariant into the strong category.
+
+\subsubsection{Proposed Lifting Approach}
+
+Since reasoning about invariants is complicated at a high level as in C code, it is reasonable to assume that our analysis will be performed on an intermediate representation to avoid noise related to semantics.
+
+We propose a two-phase approach for Tigress opaque predicates to be removed. Due to its complexity and lack of time, we were unable to implement it.
+
+\begin{enumerate}
+    \item Since invariants can be relatively simple as we have pointed out, it is possible to first statically analyze the code to remove unnecessary branches through the \textbf{abstract interpretation} technique (see \cite{abstract}). This technique has already been used in the literature for the detection of opaque predicates \cite{abstract_detection}.
+    \item Since the evaluation of some branches is particularly difficult (typically with the entropy thread), if the static analysis was not sufficient, we can use the \textbf{concolic execution} technique to determine which branches are never taken (an example of implementation is proposed in the paper  \cite{concolic}).
+\end{enumerate}
+
+\section{Conclusion}
+
+In our effort, we managed to analyse a small part of the Tigress transformations and to partially lift the expressions generated in \textbf{EncodeArithmetic}. However, we realised that it is difficult to completely deobfuscate even a single transformation and even more so when combining them. The literature on the subject is still rather limited and leaves many room for improvement. It is also regrettable that an academic project such as Tigress is not available in open-source, which limits the understanding of some of the techniques it uses.
+
+%%%%%%%%%%%%%%
+% References %
+%%%%%%%%%%%%%%
+
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\newpage 
+\appendix
+\onecolumn
+
+\label{app:rules}
+\begin{tabularx}{\linewidth}{lcc@{}}
+\toprule
+  & \textbf{MBA Expressions} & \textbf{Identity} \\ \midrule
+ \multicolumn{2}{@{}l}{$a \land b$}\\
+   1 & $(((\neg a \lor b) + a) + 1)$ & $((\neg a \lor b) - \neg a)$   \\
+   2 & $((\neg a \lor b) - \neg a)$      \\
+  \midrule
+ \multicolumn{2}{@{}l}{$a \lor b$}\\
+    1 & $(((a + b) + 1) + ((- a - 1) \lor (- b - 1)))$ & $((a \land \neg b) + b)$ \\
+    2 & $((a \land \neg b) + b)$ \\
+  \midrule
+ \multicolumn{2}{@{}l}{$a \oplus b$}\\
+    1 & $(((a - b) - ((a \lor \neg b) + (a \lor \neg b))) - 2)$  \\
+    2 & $(((a - b) - ((a \lor \neg b) \ll 1)) - 2)$ \\
+    3 & $((a \lor b) - (a \land b))$ \\
+  \midrule
+  \multicolumn{2}{@{}l}{$a \oplus b$}\\
+    1 & $(((a - b) - ((a \lor \neg b) + (a \lor \neg b))) - 2)$  \\
+    2 & $(((a - b) - ((a \lor \neg b) \ll 1)) - 2)$ \\
+    3 & $((a \lor b) - (a \land b))$ \\
+  \midrule 
+  \multicolumn{2}{@{}l}{$a + b$}\\
+    1 & $(((a \oplus \neg b) + ((a \lor b) + (a \lor b))) + 1)$  \\
+    2 & $(((a \oplus \neg b) + ((a \lor b) \ll 1)) + 1)$ \\
+    3 & $(((a \lor b) + (a \lor b)) - (a \oplus b))$ \\
+    4 & $(((a \lor b) \ll 1) - (a \oplus b))$ \\
+    5 & $((a - \neg b) - 1)$ \\
+    6 & $((a \oplus b) + ((a \land b) + (a \land b)))$ \\
+    7 & $((a \oplus b) + ((a \land b) \ll 1))$ \\
+    8 & $((a \lor b) + (a \land b))$ \\
+  \midrule 
+  \multicolumn{2}{@{}l}{$a - b$}\\
+    1 & $(((a \land ~ b) + (a \land ~ b)) - (a \oplus b))$  \\
+    2 & $(((a \land ~ b) \ll 1) - (a \oplus b))$ \\
+    3 & $((a \land ~ b) - (~ a \land b))$ \\
+    4 & $(((a \lor b) \ll 1) - (a \oplus b))$ \\
+    5 & $((a + ~ b) + 1)$ \\
+    6 & $((a \oplus b) - ((~ a \land b) + (~ a \land b)))$ \\
+    7 & $((a \oplus b) - ((~ a \land b) \ll 1))$ \\
+  \midrule 
+  \multicolumn{2}{@{}l}{$a \times b$}\\
+    1 & $((a \land b) \times (a \lor b) + (a \land \neg b) \times (\neg a \land b))$  \\
+  \midrule 
+  \multicolumn{2}{@{}l}{$a = b$}\\
+    1 & $(\neg (a - b) \lor (b - a)) \gg b) \land 1$  \\
+  \midrule 
+  \multicolumn{2}{@{}l}{$a \neq b$}\\
+    1 & $((a - b) \lor (b - a)) \gg b) \land 1$  \\
+  \midrule 
+  \multicolumn{2}{@{}l}{$a \geq b$}\\
+    1 & $((\neq (b \oplus a) \gg 1) + (b \land \neq a)) \gg b) \land 1)$  \\
+  \midrule 
+  \multicolumn{2}{@{}l}{$a \leq b$}\\
+    1 & $((\neq (a \oplus b) \gg 1) + (a \land \neq b)) \gg b) \land 1)$  \\
+  \midrule 
+  \multicolumn{2}{@{}l}{$a * 2$}\\
+    1 & $a \ll 1$  \\
+  \midrule 
+   \multicolumn{2}{@{}l}{$\neg a$}\\
+    1 & $(- a - 1) $    \\
+  \bottomrule      \\
+\caption{Rewrite rules used by Tigress for generating MBA ex-pressions}
+\end{tabularx}
+
+It is possible to reproduce these results by going to the \verb|samples/encode_arithmetic|  folder and running the bash script \verb|generate.sh| with a large number of iterations ($n \geq 500$). A \verb|out\sorted| folder will be generated with the corresponding identities.
+
+\end{document}

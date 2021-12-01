@@ -1,4 +1,4 @@
-﻿(*
+(*
     MIT License
 
     Copyright (c) 2021 Alban DUTILLEUl, Gauvain THOMAS
@@ -22,35 +22,7 @@
     SOFTWARE.
 *)
 
+module Program =
 
-module MBASimplifier.Input
-
-let private whitespace = [| ' '; '\t' |]
-
-type Command =
-    | Exit
-    | Help
-    | ReadFile of string
-    | ReadInput of string
-    | ClearConsole
-
-    static member parse (commandString:string) =
-        let input = ReadInput commandString
-        let tokens = commandString.Split(whitespace, 2, System.StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
-        match tokens with
-            // No arguments
-            | [command] ->
-                match command with
-                    | "quit"   | "exit"  -> Exit
-                    | "help" -> Help
-                    | "clear" -> ClearConsole
-                    | _ -> input
-        
-            // One argument
-            | [command; arg] ->
-                match command with
-                    | "read"  -> ReadFile arg
-                    | _ -> input
-        
-            | _ -> input
-
+    [<EntryPoint>]
+    let main _ = 0

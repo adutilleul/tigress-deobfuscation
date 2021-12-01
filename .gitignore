@@ -1,4 +1,3 @@
-scripts/a.out
-res/generated/arith.c
-res/generated/litterals.c
-simplifier/_build
+.ionide
+.vs
+.vscode

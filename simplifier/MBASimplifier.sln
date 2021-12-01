@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MBASimplifier", "MBASimplifier\MBASimplifier.fsproj", "{881F4FC9-8D29-48F8-B042-EE26393BE085}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "MBASimplifier", "MBASimplifier\MBASimplifier.fsproj", "{881F4FC9-8D29-48F8-B042-EE26393BE085}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MBASimplifier.Tests", "MBASimplifier.Tests\MBASimplifier.Tests.fsproj", "{C2E4B854-7D1C-4013-9A6B-392950E79359}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{881F4FC9-8D29-48F8-B042-EE26393BE085}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{881F4FC9-8D29-48F8-B042-EE26393BE085}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{881F4FC9-8D29-48F8-B042-EE26393BE085}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2E4B854-7D1C-4013-9A6B-392950E79359}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2E4B854-7D1C-4013-9A6B-392950E79359}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2E4B854-7D1C-4013-9A6B-392950E79359}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2E4B854-7D1C-4013-9A6B-392950E79359}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
