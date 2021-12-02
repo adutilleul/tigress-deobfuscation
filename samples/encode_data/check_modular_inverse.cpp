@@ -7,11 +7,11 @@ template<
     typename T, 
     typename std::enable_if<
     std::is_integral<T>::value>::type* = nullptr, 
-    uint8_t M = 32>
+    uint32_t M = 66666>
 T fast_modular_inverse(T x) {
     const T rest = x & ~1;
     T acc = 1;
-    for(uint8_t i = 0; i < M; i++) {
+    for(uint32_t i = 0; i < M; i++) {
         if(acc & (1 << i))
             acc -= rest << i;
     }
@@ -40,7 +40,7 @@ template<
     typename T, 
     typename std::enable_if<
     std::is_integral<T>::value>::type* = nullptr, 
-    uint8_t M = 32>
+    uint32_t M = 66666>
 T naive_mod_inverse(T a) {
     T x, y;
     T g = gcd(a, M, x, y);
@@ -73,5 +73,6 @@ int main(int argc, char** argv) {
 
     std::cout << duration_slow << " ns vs " << duration_fast << " ns" << std::endl;
     std::cout << _slow << std::endl;
+    std::cout << _fast << std::endl;
 
 }

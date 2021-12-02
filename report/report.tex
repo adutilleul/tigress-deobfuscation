@@ -189,7 +189,11 @@ doi={10.1109/SP.2017.36}}
 
 \section{Introduction}
 
-In this project we will propose look at three transformations of the Tigress source-to-source obfuscator for the C language and propose ways to solve them. We will also consider our implementation of a tool to simplify \textsf{MBA} (Mixed Boolean-Arithmetic ) expressions which we will define in detail later.
+Code obfuscation is the process of modifying a program, in order to make it unclear and unintelligible (mostly for humans), while remaining functional. It can be achieved for several goals such as hiding the purpose of the software, as well as its behavior and logic, which makes its reverse engineering harder. Either a source code or a binary can be obfuscated.
+One way to obfuscate one's code is to use a automated dedicated tool, such as Tigress.
+Tigress is a software, allowing direct obfuscation of C source code in many several ways -of which will be described in this paper- and even allowing combinations and recursive uses of those.
+Even though these modifications makes it difficult to understand and reverse engineering a code, it is however not impossible to do the obfuscation inverse operation, deobfuscation, which we'll focus on.
+This project will focus on studying three different ways of Tigress to obfuscate C code, and providing tools to undo them.
 
 \section{Analysis and attacks of several Tigress transformations}
 
@@ -202,7 +206,7 @@ Indeed the other transformations are not very interesting, they use trivial iden
 
 \begin{description}[font=\sffamily\bfseries, leftmargin=1cm, style=nextline]
   \item[poly1]
-    Linear transformation using invertible affine functions $f(x) = ax +b$ (with $a \neq  0$) and $f^{-1}(x) = a^{-1} \times x - b \times a^{-1}$.
+    Linear transformation using invertible affine functions $f(x) = ax +b$ (with $a \neq  0$) and $f^{-1}(x) = a^{-1}x - ba^{-1}$ in $\Z/2^n\Z$
   \item[xor]
     Exclusive-or with a constant using the identity $A \oplus C \oplus C = A$.
   \item[add]
